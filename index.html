@@ -38,4 +38,24 @@ button{background:#087c83;color:white;border:0;padding:14px;border-radius:8px;wi
 <div class="card"><h3>Pagos</h3><button disabled>Próximamente</button></div>
 </main>
 </body>
+<script>
+function mostrarClientes() {
+  document.getElementById("clientes").style.display = "block";
+}
+
+function guardarCliente() {
+  const nombre = document.getElementById("nombre").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+
+  if (!nombre || !telefono) {
+    document.getElementById("mensaje").textContent =
+      "Escribe el nombre y teléfono.";
+    return;
+  }
+
+  document.getElementById("mensaje").textContent =
+    "Formulario listo. Falta conectar Supabase para guardar.";
+}
+</script>
+
 </html>
