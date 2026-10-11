@@ -16,7 +16,23 @@ button{background:#087c83;color:white;border:0;padding:14px;border-radius:8px;wi
 <header><h1>INOVALUM CRM</h1><p>Aluminio y Cristal</p></header>
 <main>
 <h2>Panel principal</h2>
-<div class="card"><h3>Clientes</h3><button disabled>Próximamente</button></div>
+
+<div class="card">
+  <h3>Clientes</h3>
+  <button onclick="mostrarClientes()">
+    Registrar cliente
+  </button>
+</div>
+
+<div id="clientes" class="card" style="display:none">
+  <h3>Nuevo cliente</h3>
+  <input id="nombre" placeholder="Nombre del cliente">
+  <input id="telefono" placeholder="Teléfono">
+  <input id="direccion" placeholder="Dirección">
+  <button onclick="guardarCliente()">Guardar cliente</button>
+  <p id="mensaje"></p>
+</div>
+
 <div class="card"><h3>Cotizaciones</h3><button disabled>Próximamente</button></div>
 <div class="card"><h3>Instalaciones</h3><button disabled>Próximamente</button></div>
 <div class="card"><h3>Pagos</h3><button disabled>Próximamente</button></div>
