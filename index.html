@@ -90,7 +90,8 @@ async function guardarCliente() {
     );
 
     if (!respuesta.ok) {
-      throw new Error("No se pudo guardar el cliente.");
+    const detalle = await respuesta.text();
+throw new Error(detalle);
     }
 
     mensaje.textContent = "Cliente guardado correctamente.";
