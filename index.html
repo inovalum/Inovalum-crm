@@ -13,6 +13,13 @@ button{background:#087c83;color:white;border:0;padding:14px;border-radius:8px;wi
 </style>
 </head>
 <body>
+  <div class="card" id="login">
+  <h2>Iniciar sesión</h2>
+  <input id="correo" type="email" placeholder="Correo electrónico">
+  <input id="contrasena" type="password" placeholder="Contraseña">
+  <button onclick="iniciarSesion()">Entrar</button>
+  <p id="mensajeLogin"></p>
+</div>
 <header><h1>INOVALUM CRM</h1><p>Aluminio y Cristal</p></header>
 <main>
 <h2>Panel principal</h2>
@@ -87,6 +94,42 @@ async function guardarCliente() {
     }
 
     mensaje.textContent = "Cliente guardado correctamente.";
+  } catch (error) {
+    mensaje.textContent = error.message;
+  }
+}
+
+async function iniciarSesion() {
+  const correo = document.getElementById("correo").value.trim();
+  const contrasena = document.getElementById("contrasena").value;
+  const mensaje = document.getElementById("mensajeLogin");
+
+  mensaje.textContent = "Iniciando sesión...";
+
+  try {
+    const respuesta = await fetch(
+      SUPABASE_URL + "/auth/v1/token?grant_type=password",
+      {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: correo,
+          password: contrasena
+        })
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+      throw new Error(datos.msg || datos.error_description || datos.message || "No se pudo iniciar sesión");
+    }
+
+    localStorage.setItem("supabase_token", datos.access_token);
+    mensaje.textContent = "Sesión iniciada correctamente.";
   } catch (error) {
     mensaje.textContent = error.message;
   }
