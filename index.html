@@ -40,6 +40,12 @@ button{background:#087c83;color:white;border:0;padding:14px;border-radius:8px;wi
   <p id="mensaje"></p>
 </div>
 
+<div class="card">
+  <h3>Lista de clientes</h3>
+  <button onclick="verClientes()">Ver clientes</button>
+  <div id="listaClientes"></div>
+</div>
+
 <div class="card"><h3>Cotizaciones</h3><button disabled>Próximamente</button></div>
 <div class="card"><h3>Instalaciones</h3><button disabled>Próximamente</button></div>
 <div class="card"><h3>Pagos</h3><button disabled>Próximamente</button></div>
@@ -133,6 +139,51 @@ async function iniciarSesion() {
     mensaje.textContent = "Sesión iniciada correctamente.";
   } catch (error) {
     mensaje.textContent = error.message;
+  }
+}
+
+async function verClientes() {
+  const lista = document.getElementById("listaClientes");
+  lista.textContent = "Cargando clientes...";
+
+  try {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      lista.textContent = "Primero inicia sesión.";
+      return;
+    }
+
+    const respuesta = await fetch(
+      SUPABASE_URL + "/rest/v1/clientes?select=nombre,telefono,direccion",
+      {
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + token
+        }
+      }
+    );
+
+    if (!respuesta.ok) {
+      throw new Error(await respuesta.text());
+    }
+
+    const clientes = await respuesta.json();
+    lista.replaceChildren();
+
+    if (clientes.length === 0) {
+      lista.textContent = "No hay clientes registrados.";
+      return;
+    }
+
+    clientes.forEach(cliente => {
+      const p = document.createElement("p");
+      p.textContent = `${cliente.nombre} - ${cliente.telefono || ""} - ${cliente.direccion || ""}`;
+      lista.appendChild(p);
+    });
+
+  } catch (error) {
+    lista.textContent = "Error: " + error.message;
   }
 }
 
