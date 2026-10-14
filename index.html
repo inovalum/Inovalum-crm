@@ -147,7 +147,7 @@ async function verClientes() {
   lista.textContent = "Cargando clientes...";
 
   try {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("supabase_token");
 
     if (!token) {
       lista.textContent = "Primero inicia sesión.";
