@@ -184,7 +184,7 @@ async function verClientes() {
       p.textContent = `${cliente.nombre} - ${cliente.telefono || ""} - ${cliente.direccion || ""}`;
       lista.appendChild(p);
     });
-
+filtrarClientes();
   } catch (error) {
     lista.textContent = "Error: " + error.message;
   }
