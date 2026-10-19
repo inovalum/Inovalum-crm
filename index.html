@@ -158,7 +158,7 @@ async function verClientes() {
     }
 
     const respuesta = await fetch(
-      SUPABASE_URL + "/rest/v1/clientes?select=nombre,telefono,direccion",
+      SUPABASE_URL + "/rest/v1/clientes?select=id,nombre,telefono,direccion",
       {
         headers: {
           "apikey": SUPABASE_KEY,
@@ -183,6 +183,18 @@ async function verClientes() {
       const p = document.createElement("p");
       p.textContent = `${cliente.nombre} - ${cliente.telefono || ""} - ${cliente.direccion || ""}`;
       lista.appendChild(p);
+      
+const botonEditar = document.createElement("button");
+botonEditar.textContent = "Editar";
+botonEditar.onclick = () => editarCliente(cliente);
+p.appendChild(botonEditar);
+      
+const botonEliminar = document.createElement("button");
+botonEliminar.textContent = "Eliminar";
+botonEliminar.onclick = () => eliminarCliente(cliente);
+p.appendChild(botonEliminar);
+
+
     });
 filtrarClientes();
   } catch (error) {
@@ -200,6 +212,104 @@ function filtrarClientes() {
       ? ""
       : "none";
   });
+}
+
+
+async function editarCliente(cliente) {
+  const nombre = prompt("Nombre del cliente:", cliente.nombre);
+  if (nombre === null) return;
+  if (!nombre.trim()) {
+    alert("El nombre no puede estar vacío");
+    return;
+  }
+
+  const telefono = prompt("Teléfono:", cliente.telefono || "");
+  if (telefono === null) return;
+
+  const direccion = prompt("Dirección:", cliente.direccion || "");
+  if (direccion === null) return;
+
+  const token = localStorage.getItem("supabase_token");
+  if (!token) {
+    alert("Primero inicia sesión");
+    return;
+  }
+
+  try {
+    const respuesta = await fetch(
+      SUPABASE_URL + "/rest/v1/clientes?id=eq." + encodeURIComponent(cliente.id),
+      {
+        method: "PATCH",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json",
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify({
+          nombre: nombre.trim(),
+          telefono: telefono.trim(),
+          direccion: direccion.trim()
+        })
+      }
+    );
+
+    if (!respuesta.ok) {
+      throw new Error(await respuesta.text());
+    }
+
+    const actualizados = await respuesta.json();
+    if (actualizados.length !== 1) {
+      throw new Error("No se pudo confirmar la actualización");
+    }
+
+    alert("Cliente actualizado correctamente");
+    await verClientes();
+  } catch (error) {
+    alert("Error al editar: " + error.message);
+  }
+}
+
+async function eliminarCliente(cliente) {
+  if (!confirm("¿Seguro que deseas eliminar a " + cliente.nombre + "?")) {
+    return;
+  }
+
+  const token = localStorage.getItem("supabase_token");
+
+  if (!token) {
+    alert("Primero inicia sesión");
+    return;
+  }
+
+  try {
+    const respuesta = await fetch(
+      SUPABASE_URL + "/rest/v1/clientes?id=eq." + encodeURIComponent(cliente.id),
+      {
+        method: "DELETE",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + token,
+          "Prefer": "return=representation"
+        }
+      }
+    );
+
+    if (!respuesta.ok) {
+      throw new Error(await respuesta.text());
+    }
+
+    const eliminados = await respuesta.json();
+
+    if (eliminados.length !== 1) {
+      throw new Error("No se pudo confirmar la eliminación");
+    }
+
+    alert("Cliente eliminado correctamente");
+    await verClientes();
+  } catch (error) {
+    alert("Error al eliminar: " + error.message);
+  }
 }
 
 </script>
